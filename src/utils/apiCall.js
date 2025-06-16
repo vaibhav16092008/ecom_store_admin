@@ -6,11 +6,15 @@ const apiInstance = axios.create({
   timeout: 10000,
   headers: {
     Authorization: token(),
+    "Content-Type": "Application/json"
   },
 });
 const apiInstanceWH = axios.create({
   baseURL: apiConfig.baseUrl,
   timeout: 10000,
+  headers: {
+    "Content-Type": "Application/json"
+  }
 });
 
 export const postCallWH = async (url ="", data) => {  

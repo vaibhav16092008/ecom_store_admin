@@ -16,22 +16,20 @@ const LoginPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const payload = {
+      userName: username,
+      password
+    };
     try {
-      const response = postCallWH("login", {userName: username, password})
-      
+      const response = await postCallWH("login", payload);
       if (response?.data?.status === 200) {
-        console.log(response?.status);
         // console.log(response);
-        
+
         toast.success(response?.data?.message || "Login successful!");
         setToken(response?.data?.data?.token);
         window.location.href = "/dashboard";
-                
       }
-    } catch (error) {
-      
-    }
-    console.log({ username, password });
+    } catch (error) { }
   };
 
   return (
@@ -122,22 +120,20 @@ const LoginPage = () => {
               <form onSubmit={handleSubmit}>
                 <div className="mb-5">
                   <label
-                    className={`block text-sm font-medium mb-2 transition-all duration-200 ${
-                      isFocused.username || username
-                        ? "text-gray-800"
-                        : "text-gray-500"
-                    }`}
+                    className={`block text-sm font-medium mb-2 transition-all duration-200 ${isFocused.username || username
+                      ? "text-gray-800"
+                      : "text-gray-500"
+                      }`}
                   >
                     Username
                   </label>
                   <div className="relative">
                     <input
                       type="username"
-                      className={`w-full px-4 py-3 bg-gray-50 border ${
-                        isFocused.username
-                          ? "border-purple-300 ring-2 ring-purple-100"
-                          : "border-gray-200"
-                      } rounded-lg text-gray-800 placeholder-gray-400 focus:outline-none transition-all duration-200`}
+                      className={`w-full px-4 py-3 bg-gray-50 border ${isFocused.username
+                        ? "border-purple-300 ring-2 ring-purple-100"
+                        : "border-gray-200"
+                        } rounded-lg text-gray-800 placeholder-gray-400 focus:outline-none transition-all duration-200`}
                       placeholder="example123"
                       value={username}
                       onChange={(e) => setUsername(e.target.value)}
@@ -170,22 +166,20 @@ const LoginPage = () => {
 
                 <div className="mb-6">
                   <label
-                    className={`block text-sm font-medium mb-2 transition-all duration-200 ${
-                      isFocused.password || password
-                        ? "text-gray-800"
-                        : "text-gray-500"
-                    }`}
+                    className={`block text-sm font-medium mb-2 transition-all duration-200 ${isFocused.password || password
+                      ? "text-gray-800"
+                      : "text-gray-500"
+                      }`}
                   >
                     Password
                   </label>
                   <div className="relative">
                     <input
                       type="password"
-                      className={`w-full px-4 py-3 bg-gray-50 border ${
-                        isFocused.password
-                          ? "border-purple-300 ring-2 ring-purple-100"
-                          : "border-gray-200"
-                      } rounded-lg text-gray-800 placeholder-gray-400 focus:outline-none transition-all duration-200`}
+                      className={`w-full px-4 py-3 bg-gray-50 border ${isFocused.password
+                        ? "border-purple-300 ring-2 ring-purple-100"
+                        : "border-gray-200"
+                        } rounded-lg text-gray-800 placeholder-gray-400 focus:outline-none transition-all duration-200`}
                       placeholder="••••••••"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
