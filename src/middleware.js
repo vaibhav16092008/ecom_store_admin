@@ -4,20 +4,19 @@ import { NextResponse } from "next/server";
 import { tokenTitle } from "./utils/connection";
 
 export function middleware(request) {
-
   const tokenValue = request.cookies.get(tokenTitle)?.value;
   const pathname = request.nextUrl.pathname;
   console.log("tokenValue :>> ", tokenValue);
 
-  if (tokenValue && (pathname.startsWith("/dashboard") || pathname === "/")) {
-    return NextResponse.next();
-  }
-  if (tokenValue && pathname.startsWith("/login")) {
-    return NextResponse.redirect(new URL("/dashboard", request.url));
-  }
-  if (!tokenValue && (pathname.startsWith("/dashboard") || pathname === "/")) {
-    return NextResponse.redirect(new URL("/login", request.url));
-  }
+  // if (tokenValue && (pathname.startsWith("/dashboard") || pathname === "/")) {
+  //   return NextResponse.next();
+  // }
+  // if (tokenValue && pathname.startsWith("/login")) {
+  //   return NextResponse.redirect(new URL("/dashboard", request.url));
+  // }
+  // if (!tokenValue && (pathname.startsWith("/dashboard") || pathname === "/")) {
+  //   return NextResponse.redirect(new URL("/login", request.url));
+  // }
 }
 
 export const config = {
