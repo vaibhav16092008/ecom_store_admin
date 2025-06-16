@@ -1,19 +1,37 @@
 "use client";
 import React, { useState } from "react";
 import Head from "next/head";
+import axios from "axios";
+import { setToken } from "@/utils/connection";
+import toast from "react-hot-toast";
+import { postCallWH } from "@/utils/apiCall";
 
 const LoginPage = () => {
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [isFocused, setIsFocused] = useState({
-    email: false,
+    username: false,
     password: false,
   });
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle login logic
-    console.log({ email, password });
+    try {
+      const response = postCallWH("login", {userName: username, password})
+      
+      if (response?.data?.status === 200) {
+        console.log(response?.status);
+        // console.log(response);
+        
+        toast.success(response?.data?.message || "Login successful!");
+        setToken(response?.data?.data?.token);
+        window.location.href = "/dashboard";
+                
+      }
+    } catch (error) {
+      
+    }
+    console.log({ username, password });
   };
 
   return (
@@ -95,7 +113,7 @@ const LoginPage = () => {
                 </div>
                 <div className="relative flex justify-center">
                   <span className="px-3 bg-white text-sm text-gray-400">
-                    or continue with email
+                    or continue with username
                   </span>
                 </div>
               </div>
@@ -105,32 +123,32 @@ const LoginPage = () => {
                 <div className="mb-5">
                   <label
                     className={`block text-sm font-medium mb-2 transition-all duration-200 ${
-                      isFocused.email || email
+                      isFocused.username || username
                         ? "text-gray-800"
                         : "text-gray-500"
                     }`}
                   >
-                    Email address
+                    Username
                   </label>
                   <div className="relative">
                     <input
-                      type="email"
+                      type="username"
                       className={`w-full px-4 py-3 bg-gray-50 border ${
-                        isFocused.email
+                        isFocused.username
                           ? "border-purple-300 ring-2 ring-purple-100"
                           : "border-gray-200"
                       } rounded-lg text-gray-800 placeholder-gray-400 focus:outline-none transition-all duration-200`}
-                      placeholder="you@example.com"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="example123"
+                      value={username}
+                      onChange={(e) => setUsername(e.target.value)}
                       onFocus={() =>
-                        setIsFocused({ ...isFocused, email: true })
+                        setIsFocused({ ...isFocused, username: true })
                       }
                       onBlur={() =>
-                        setIsFocused({ ...isFocused, email: false })
+                        setIsFocused({ ...isFocused, username: false })
                       }
                     />
-                    {isFocused.email && (
+                    {isFocused.username && (
                       <div className="absolute top-0 right-0 h-full flex items-center pr-3">
                         <svg
                           className="w-5 h-5 text-purple-400"
