@@ -4,7 +4,7 @@ export const apiConfig = {
   baseUrl: process.env.NEXT_PUBLIC_API_URL,
 };
 
-export const tokenTitle = "DUMMY_TITLE";
+export const tokenTitle = "WEB_TOKEN_ECOM";
 
 export const token = () => Cookies.get(tokenTitle);
 export const setToken = (token = "") => {
