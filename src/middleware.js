@@ -1,9 +1,11 @@
 import Cookies from "js-cookie";
-import { token, tokenTitle } from "./utils/connection";
+// import { token, tokenTitle } from "./utils/connection";
 import { NextResponse } from "next/server";
+import { tokenTitle } from "./utils/connection";
 
 export function middleware(request) {
-  const tokenValue = request.cookies.get(tokenTitle).value;
+
+  const tokenValue = request.cookies.get(tokenTitle)?.value;
   const pathname = request.nextUrl.pathname;
   console.log("tokenValue :>> ", tokenValue);
 

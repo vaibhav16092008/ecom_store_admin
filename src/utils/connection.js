@@ -1,7 +1,7 @@
 import Cookies from "js-cookie";
 
 export const apiConfig = {
-  baseUrl: process.env.NEXT_PUBLIC_API_URL,
+  baseUrl: process.env.NEXT_PUBLIC_ADMIN_API_URL,
 };
 
 export const tokenTitle = "WEB_TOKEN_ECOM";
