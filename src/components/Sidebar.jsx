@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { FiHome, FiCompass, FiBookmark, FiSettings, FiUser, FiLogOut, FiPlus, FiChevronDown, FiChevronRight, FiPackage, FiPaperclip } from "react-icons/fi";
+import { FiHome, FiCompass, FiBookmark, FiSettings, FiUser, FiLogOut, FiPlus, FiChevronDown, FiChevronRight, FiPackage, FiPaperclip, FiPlayCircle, FiPocket } from "react-icons/fi";
 import { useState } from "react";
 
 const Sidebar = ({ isOpen }) => {
@@ -31,6 +31,11 @@ const Sidebar = ({ isOpen }) => {
             name: "Category",
             icon: <FiPaperclip size={20} />,
             path: "/dashboard/category",
+        },
+        {
+            name: "Brands",
+            icon: <FiPocket size={20} />,
+            path: "/dashboard/brands",
         },
         {
             name: "Content",

@@ -23,7 +23,17 @@ const CategoryPage = () => {
         isActive: true
     });
 
+    const [editingCategory, setEditingCategory] = useState({
+        id: '',
+        name: '',
+        slug: '',
+        description: '',
+        imageUrl: '',
+        isActive: true
+    });
+
     const [isAdding, setIsAdding] = useState(false);
+    const [isEditing, setIsEditing] = useState(false);
 
     useEffect(() => {
         fetchCategories();
@@ -41,10 +51,7 @@ const CategoryPage = () => {
 
             if (response.data.status === 200) {
                 setCategories(response.data.data.category || []);
-                // Calculate total pages based on total count and limit
                 const total = response.data.data.total || 0;
-
-
                 setTotalPages(Math.ceil(total / query.limit));
             }
         } catch (err) {
@@ -58,6 +65,14 @@ const CategoryPage = () => {
     const handleInputChange = (e) => {
         const { name, value, type, checked } = e.target;
         setNewCategory(prev => ({
+            ...prev,
+            [name]: type === 'checkbox' ? checked : value
+        }));
+    };
+
+    const handleEditInputChange = (e) => {
+        const { name, value, type, checked } = e.target;
+        setEditingCategory(prev => ({
             ...prev,
             [name]: type === 'checkbox' ? checked : value
         }));
@@ -81,10 +96,26 @@ const CategoryPage = () => {
                 isActive: true
             });
             setIsAdding(false);
-            // Refresh the categories after adding
             await fetchCategories();
         } catch (err) {
             console.error('Error creating category:', err);
+        }
+    };
+
+    const handleUpdate = async (e) => {
+        e.preventDefault();
+        const payload = {
+            ...editingCategory,
+            image: editingCategory.imageUrl
+        }
+        try {
+            const response = await postCall(`category/update/${editingCategory.id}`, payload);
+            console.log(response);
+
+            setIsEditing(false);
+            await fetchCategories();
+        } catch (err) {
+            console.error('Error updating category:', err);
         }
     };
 
@@ -94,14 +125,23 @@ const CategoryPage = () => {
 
     const handleDelete = async (id) => {
         try {
-            // Here you would typically make a DELETE API call
-            // For now, we'll just remove it locally and refresh the list
-            setCategories(categories.filter(category => category.id !== id));
-            // Refresh the categories after deletion
+            await postCall(`category/delete/${id}`);
             await fetchCategories();
         } catch (err) {
             console.error('Error deleting category:', err);
         }
+    };
+
+    const handleEdit = (category) => {
+        setEditingCategory({
+            id: category._id || category.id,
+            name: category.name,
+            slug: category.slug,
+            description: category.description,
+            imageUrl: category.image,
+            isActive: category.isActive
+        });
+        setIsEditing(true);
     };
 
     const handleSearch = (e) => {
@@ -109,7 +149,6 @@ const CategoryPage = () => {
         setQuery(prev => ({
             ...prev,
             search: value,
-            page: 1 // Reset to first page when searching
         }));
     };
 
@@ -143,6 +182,121 @@ const CategoryPage = () => {
 
     return (
         <div className="container mx-auto px-4 py-8">
+            {/* Edit Category Modal */}
+            {isEditing && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                    <div className="bg-white rounded-lg shadow-lg w-full max-w-2xl">
+                        <div className="p-5">
+                            <div className="flex justify-between items-center mb-4">
+                                <h2 className="text-lg font-semibold text-gray-800">Edit Category</h2>
+                                <button
+                                    onClick={() => setIsEditing(false)}
+                                    className="text-gray-500 hover:text-gray-700"
+                                >
+                                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
+                            </div>
+                            <form onSubmit={handleUpdate}>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">Name *</label>
+                                        <input
+                                            type="text"
+                                            name="name"
+                                            value={editingCategory.name}
+                                            onChange={(e) => {
+                                                handleEditInputChange(e);
+                                                setEditingCategory(prev => ({
+                                                    ...prev,
+                                                    slug: generateSlug(e.target.value)
+                                                }));
+                                            }}
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                                            required
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">Slug *</label>
+                                        <input
+                                            type="text"
+                                            name="slug"
+                                            value={editingCategory.slug}
+                                            onChange={handleEditInputChange}
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-sm bg-gray-50"
+                                            required
+                                            readOnly
+                                        />
+                                    </div>
+                                    <div className="md:col-span-2">
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                                        <textarea
+                                            name="description"
+                                            value={editingCategory.description}
+                                            onChange={handleEditInputChange}
+                                            rows={2}
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                                        />
+                                    </div>
+                                    <div className="md:col-span-2">
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">Image URL</label>
+                                        <input
+                                            type="url"
+                                            name="imageUrl"
+                                            value={editingCategory.imageUrl}
+                                            onChange={handleEditInputChange}
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                                            placeholder="https://example.com/image.jpg"
+                                        />
+                                        {editingCategory.imageUrl && (
+                                            <div className="mt-2">
+                                                <div className="h-20 w-20 rounded-md overflow-hidden border border-gray-200">
+                                                    <img src={editingCategory.imageUrl} alt="Preview" className="h-full w-full object-cover" />
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div className="flex items-center">
+                                        <label className="flex items-center cursor-pointer">
+                                            <div className="relative">
+                                                <input
+                                                    type="checkbox"
+                                                    name="isActive"
+                                                    checked={editingCategory.isActive}
+                                                    onChange={handleEditInputChange}
+                                                    className="sr-only"
+                                                />
+                                                <div className={`block w-12 h-6 rounded-full ${editingCategory.isActive ? 'bg-blue-500' : 'bg-gray-300'}`}></div>
+                                                <div className={`dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition ${editingCategory.isActive ? 'transform translate-x-6' : ''}`}></div>
+                                            </div>
+                                            <div className="ml-2 text-sm text-gray-700">
+                                                Active
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div className="mt-6 flex justify-end space-x-2">
+                                    <button
+                                        type="button"
+                                        onClick={() => setIsEditing(false)}
+                                        className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        type="submit"
+                                        className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md shadow-sm text-sm font-medium"
+                                    >
+                                        Update Category
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             <div className="flex justify-between items-center mb-8">
                 <div>
                     <h1 className="text-2xl font-bold text-gray-800">Category Management</h1>
@@ -298,50 +452,54 @@ const CategoryPage = () => {
                             </tr>
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-200">
-                            {categories.map((category) => (
-                                <tr key={category._id || category.id} className="hover:bg-gray-50">
-                                    <td className="px-5 py-4">
-                                        <div className="flex items-center">
-                                            <div className="flex-shrink-0 h-10 w-10 rounded-md overflow-hidden">
-                                                <img className="h-full w-full object-cover" src={category.image} alt={category.name} />
+                            {categories.length != 0 ?
+                                categories.map((category) => (
+                                    <tr key={category._id || category.id} className="hover:bg-gray-50">
+                                        <td className="px-5 py-4">
+                                            <div className="flex items-center">
+                                                <div className="flex-shrink-0 h-10 w-10 rounded-md overflow-hidden">
+                                                    <img className="h-full w-full object-cover" src={category.image} alt={category.name} />
+                                                </div>
+                                                <div className="ml-3">
+                                                    <div className="text-sm font-medium text-gray-900">{category.name}</div>
+                                                    <div className="text-xs text-gray-500">/{category.slug}</div>
+                                                </div>
                                             </div>
-                                            <div className="ml-3">
-                                                <div className="text-sm font-medium text-gray-900">{category.name}</div>
-                                                <div className="text-xs text-gray-500">/{category.slug}</div>
+                                        </td>
+                                        <td className="px-5 py-4 whitespace-nowrap">
+                                            <span className={`px-2 py-1 inline-flex text-xs leading-4 font-semibold rounded-full ${category.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
+                                                {category.isActive ? 'Active' : 'Inactive'}
+                                            </span>
+                                        </td>
+                                        <td className="px-5 py-4">
+                                            <div className="text-sm text-gray-500 max-w-xs line-clamp-2">{category.description}</div>
+                                        </td>
+                                        <td className="px-5 py-4 whitespace-nowrap text-sm font-medium">
+                                            <div className="flex space-x-2">
+                                                <button
+                                                    onClick={() => handleEdit(category)}
+                                                    className="text-blue-600 hover:text-blue-800 p-1 rounded hover:bg-blue-50"
+                                                    title="Edit"
+                                                >
+                                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                                    </svg>
+                                                </button>
+                                                <button
+                                                    onClick={() => handleDelete(category._id || category.id)}
+                                                    className="text-red-600 hover:text-red-800 p-1 rounded hover:bg-red-50"
+                                                    title="Delete"
+                                                >
+                                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                    </svg>
+                                                </button>
                                             </div>
-                                        </div>
-                                    </td>
-                                    <td className="px-5 py-4 whitespace-nowrap">
-                                        <span className={`px-2 py-1 inline-flex text-xs leading-4 font-semibold rounded-full ${category.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
-                                            {category.isActive ? 'Active' : 'Inactive'}
-                                        </span>
-                                    </td>
-                                    <td className="px-5 py-4">
-                                        <div className="text-sm text-gray-500 max-w-xs line-clamp-2">{category.description}</div>
-                                    </td>
-                                    <td className="px-5 py-4 whitespace-nowrap text-sm font-medium">
-                                        <div className="flex space-x-2">
-                                            <button
-                                                className="text-blue-600 hover:text-blue-800 p-1 rounded hover:bg-blue-50"
-                                                title="Edit"
-                                            >
-                                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                                </svg>
-                                            </button>
-                                            <button
-                                                onClick={() => handleDelete(category._id || category.id)}
-                                                className="text-red-600 hover:text-red-800 p-1 rounded hover:bg-red-50"
-                                                title="Delete"
-                                            >
-                                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                                </svg>
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                            ))}
+                                        </td>
+                                    </tr>
+                                ))
+                                : <tr ><td colSpan={4} className='py-4 text-center'>No Category </td></tr>}
+
                         </tbody>
                     </table>
                 </div>
@@ -359,7 +517,7 @@ const CategoryPage = () => {
                     />
                 </div>
             </div>
-        </div>
+        </div >
     );
 };
 
