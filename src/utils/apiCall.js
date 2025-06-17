@@ -6,25 +6,25 @@ const apiInstance = axios.create({
   timeout: 10000,
   headers: {
     Authorization: token(),
-    "Content-Type": "Application/json"
+    "Content-Type": "Application/json",
   },
 });
 const apiInstanceWH = axios.create({
   baseURL: apiConfig.baseUrl,
   timeout: 10000,
   headers: {
-    "Content-Type": "Application/json"
-  }
+    "Content-Type": "Application/json",
+  },
 });
 
-export const postCallWH = async (url ="", data) => {  
+export const postCallWH = async (url = "", data) => {
   try {
     const response = await apiInstanceWH.post(url, data);
     return response;
   } catch (error) {
     return error;
   }
-}
+};
 
 // Get APi call
 export const getCall = async (url = "") => {
@@ -37,6 +37,8 @@ export const getCall = async (url = "") => {
 };
 // Post APi call
 export const postCall = async (url = "", data) => {
+  console.log(url);
+
   try {
     const response = await apiInstance.post(url, data);
 

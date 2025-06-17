@@ -1,3 +1,4 @@
+@import url("https://fonts.googleapis.com/css2?family=Huninn&display=swap");
 @import "tailwindcss";
 
 :root {
@@ -22,5 +23,83 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: "Huninn", sans-serif;
 }
+
+/* width */
+::-webkit-scrollbar {
+  width: 5px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #155dfc;
+  border-radius: 0;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* pagination start */
+.pagination {
+  justify-content: center;
+  display: flex;
+  padding-left: 0;
+  list-style: none;
+  margin: 0;
+}
+
+.page-item .page-link {
+  position: relative;
+  display: block;
+  margin: 0 2px;
+  min-height: 40px;
+  min-width: 40px;
+  border-radius: 20px;
+  text-align: center;
+  line-height: 40px;
+  color: #007bff;
+  text-decoration: none;
+}
+
+.page-item .page-link:hover {
+  background-color: #cccccc;
+}
+
+.page-item.active .page-link {
+  font-weight: 700;
+  color: #ffffff;
+  background-color: #007bff;
+}
+
+.page-item.disabled .page-link {
+  color: #6c757d;
+  pointer-events: none;
+  cursor: auto;
+}
+
+/* @media (prefers-color-scheme: dark) {
+  .page-item .page-link {
+    color: #ffffff;
+  }
+
+  .page-item .page-link:hover {
+    background-color: #343a40;
+  }
+
+  .page-item.active .page-link {
+    background-color: #007bff;
+  }
+
+  .page-item.disabled .page-link {
+    color: #6c757d;
+  }
+} */
+/* pagination end */
