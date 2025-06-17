@@ -16,7 +16,7 @@ export default function Layout({ children }) {
       <Sidebar isOpen={isSidebarOpen} />
       <Navbar isSidebarOpen={isSidebarOpen} onToggleSidebar={toggleSidebar} />
       <main
-        className={`pt-20 transition-all duration-300 ${
+        className={`pt-16 transition-all duration-300 ${
           isSidebarOpen ? "pl-72" : "pl-0"
         }`}
       >
