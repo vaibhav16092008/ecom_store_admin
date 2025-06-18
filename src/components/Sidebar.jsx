@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { FiHome, FiCompass, FiBookmark, FiSettings, FiUser, FiLogOut, FiPlus, FiChevronDown, FiChevronRight, FiPackage, FiPaperclip, FiPlayCircle, FiPocket } from "react-icons/fi";
 import { useState } from "react";
+import { removeToken } from "@/utils/connection";
 
 const Sidebar = ({ isOpen }) => {
     const pathname = usePathname();
@@ -15,7 +16,10 @@ const Sidebar = ({ isOpen }) => {
             [menuName]: !prev[menuName]
         }));
     };
-
+    const handleLogout = () => {
+        removeToken()
+        window.location.href = "/login"
+    }
     const navItems = [
         {
             name: "Dashboard",
@@ -150,7 +154,7 @@ const Sidebar = ({ isOpen }) => {
                     <span className="tracking-wide">Settings</span>
                 </Link>
 
-                <button className="flex items-center w-full px-4 py-3 text-[15px] text-gray-700 rounded-lg hover:bg-gray-100 transition-all duration-200">
+                <button onClick={handleLogout} className="cursor-pointer flex items-center w-full px-4 py-3 text-[15px] text-gray-700 rounded-lg hover:bg-gray-100 transition-all duration-200">
                     <FiLogOut size={20} className="mr-3 text-gray-500 transition-colors" />
                     <span className="tracking-wide">Logout</span>
                 </button>
