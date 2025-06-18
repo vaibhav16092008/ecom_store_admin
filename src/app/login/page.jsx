@@ -1,7 +1,6 @@
 "use client";
 import React, { useState } from "react";
 import Head from "next/head";
-import axios from "axios";
 import { setToken } from "@/utils/connection";
 import toast from "react-hot-toast";
 import { postCallWH } from "@/utils/apiCall";
