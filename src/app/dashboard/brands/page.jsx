@@ -17,26 +17,26 @@ const BrandsPage = () => {
 
     const [newBrands, setNewBrands] = useState({
         name: '',
-        imageUrl: '',
+        logo: '',
     });
 
     const [isAdding, setIsAdding] = useState(false);
 
     useEffect(() => {
-        fetchCategories();
+        fetchBrands();
     }, [query.page, query.search]);
 
-    const fetchCategories = async () => {
+    const fetchBrands = async () => {
         try {
             setLoading(true);
-            const response = await postCall('brands', {
+            const response = await postCall('brand', {
                 all: query.all,
                 page: query.page,
                 limit: query.limit,
                 search: query.search
             });
 
-            if (response.data.status === 200) {
+            if (response?.data?.status === 200) {
                 setBrands(response.data.data.brands || []);
                 // Calculate total pages based on total count and limit
                 const total = response.data.data.total || 0;
@@ -64,19 +64,18 @@ const BrandsPage = () => {
         e.preventDefault();
         const payload = {
             ...newBrands,
-            image: newBrands.imageUrl
         }
         try {
-            const response = await postCall('brands/add', payload);
+            const response = await postCall('brand/add', payload);
             console.log(response);
 
             setNewBrands({
                 name: '',
-                imageUrl: '',
+                logo: '',
             });
             setIsAdding(false);
             // Refresh the brands after adding
-            await fetchCategories();
+            await fetchBrands();
         } catch (err) {
             console.error('Error creating brands:', err);
         }
@@ -92,7 +91,7 @@ const BrandsPage = () => {
             // For now, we'll just remove it locally and refresh the list
             setBrands(brands.filter(brands => brands.id !== id));
             // Refresh the brands after deletion
-            await fetchCategories();
+            await fetchBrands();
         } catch (err) {
             console.error('Error deleting brands:', err);
         }
@@ -176,16 +175,16 @@ const BrandsPage = () => {
                                     <label className="block text-sm font-medium text-gray-700 mb-1">Logo</label>
                                     <input
                                         type="url"
-                                        name="imageUrl"
-                                        value={newBrands.imageUrl}
+                                        name="logo"
+                                        value={newBrands.logo}
                                         onChange={handleInputChange}
                                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-sm"
                                         placeholder="https://example.com/image.jpg"
                                     />
-                                    {newBrands.imageUrl && (
+                                    {newBrands.logo && (
                                         <div className="mt-2">
                                             <div className="h-20 w-20 rounded-md overflow-hidden border border-gray-200">
-                                                <img src={newBrands.imageUrl} alt="Preview" className="h-full w-full object-cover" />
+                                                <img src={newBrands.logo} alt="Preview" className="h-full w-full object-cover" />
                                             </div>
                                         </div>
                                     )}
@@ -250,7 +249,7 @@ const BrandsPage = () => {
                                         <td className="px-5 py-4">
                                             <div className="flex items-center">
                                                 <div className="flex-shrink-0 h-10 w-10 rounded-md overflow-hidden">
-                                                    <img className="h-full w-full object-cover" src={brands.image} alt={brands.name} />
+                                                    <img className="h-full w-full object-cover" src={brands.logo} alt={brands.name} />
                                                 </div>
                                                 <div className="ml-3">
                                                     <div className="text-sm font-medium text-gray-900">{brands.name}</div>
