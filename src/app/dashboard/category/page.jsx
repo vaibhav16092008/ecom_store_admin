@@ -1,7 +1,9 @@
 "use client";
 import React, { useEffect, useState } from 'react';
 import ResponsivePagination from 'react-responsive-pagination';
-import { getCall, postCall } from '@/utils/apiCall';
+import { deleteCall, postCall, putCall } from '@/utils/apiCall';
+import { toast } from 'react-hot-toast';
+import ConfirmBox from '@/component/ConfirmBox';
 
 const CategoryPage = () => {
     const [categories, setCategories] = useState([]);
@@ -10,11 +12,11 @@ const CategoryPage = () => {
     const [query, setQuery] = useState({
         all: false,
         page: 1,
-        limit: 2,
+        limit: 5,
         search: "",
     });
     const [totalPages, setTotalPages] = useState(1);
-
+    const [isConfirmOpen, setIsConfirmOpen] = useState(false);
     const [newCategory, setNewCategory] = useState({
         name: '',
         slug: '',
@@ -49,7 +51,7 @@ const CategoryPage = () => {
                 search: query.search
             });
 
-            if (response.data.status === 200) {
+            if (response.data?.status === 200) {
                 setCategories(response.data.data.category || []);
                 const total = response.data.data.total || 0;
                 setTotalPages(Math.ceil(total / query.limit));
@@ -96,6 +98,7 @@ const CategoryPage = () => {
                 isActive: true
             });
             setIsAdding(false);
+            toast.success(response.data.message)
             await fetchCategories();
         } catch (err) {
             console.error('Error creating category:', err);
@@ -108,11 +111,21 @@ const CategoryPage = () => {
             ...editingCategory,
             image: editingCategory.imageUrl
         }
+
         try {
-            const response = await postCall(`category/update/${editingCategory.id}`, payload);
+            const response = await putCall(`category/edit`, payload);
             console.log(response);
 
             setIsEditing(false);
+            setEditingCategory({
+                id: '',
+                name: '',
+                slug: '',
+                description: '',
+                imageUrl: '',
+                isActive: true
+            })
+            toast.success(response?.data?.message)
             await fetchCategories();
         } catch (err) {
             console.error('Error updating category:', err);
@@ -122,13 +135,25 @@ const CategoryPage = () => {
     const generateSlug = (name) => {
         return name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
     };
-
+    const handleConfirmAction = (confirmed) => {
+        setIsConfirmOpen(false);
+        if (confirmed) {
+            console.log("User confirmed the action");
+            // Perform your action here
+        } else {
+            console.log("User canceled the action");
+        }
+    };
     const handleDelete = async (id) => {
         try {
-            await postCall(`category/delete/${id}`);
+
+            const response = await deleteCall(`category/${id}`);
+            toast.success(response.data.message);
             await fetchCategories();
+
         } catch (err) {
             console.error('Error deleting category:', err);
+            toast.error(err.response?.data?.message || 'Failed to delete category');
         }
     };
 
@@ -184,14 +209,14 @@ const CategoryPage = () => {
         <div className="container mx-auto px-4 py-8">
             {/* Edit Category Modal */}
             {isEditing && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                <div className="fixed inset-0 bg-black/30 backdrop-blur-lg bg-opacity-50 flex items-center justify-center z-50 p-4">
                     <div className="bg-white rounded-lg shadow-lg w-full max-w-2xl">
                         <div className="p-5">
                             <div className="flex justify-between items-center mb-4">
                                 <h2 className="text-lg font-semibold text-gray-800">Edit Category</h2>
                                 <button
                                     onClick={() => setIsEditing(false)}
-                                    className="text-gray-500 hover:text-gray-700"
+                                    className="cursor-pointer text-gray-500 hover:text-gray-700"
                                 >
                                     <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -205,15 +230,17 @@ const CategoryPage = () => {
                                         <input
                                             type="text"
                                             name="name"
+                                            disabled
+                                            readOnly
                                             value={editingCategory.name}
-                                            onChange={(e) => {
-                                                handleEditInputChange(e);
-                                                setEditingCategory(prev => ({
-                                                    ...prev,
-                                                    slug: generateSlug(e.target.value)
-                                                }));
-                                            }}
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                                            // onChange={(e) => {
+                                            //     handleEditInputChange(e);
+                                            //     setEditingCategory(prev => ({
+                                            //         ...prev,
+                                            //         slug: generateSlug(e.target.value)
+                                            //     }));
+                                            // }}
+                                            className="cursor-not-allowed w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-sm"
                                             required
                                         />
                                     </div>
@@ -223,10 +250,11 @@ const CategoryPage = () => {
                                             type="text"
                                             name="slug"
                                             value={editingCategory.slug}
-                                            onChange={handleEditInputChange}
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-sm bg-gray-50"
+                                            // onChange={handleEditInputChange}
+                                            className="cursor-not-allowed w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-sm bg-gray-50"
                                             required
                                             readOnly
+                                            disabled
                                         />
                                     </div>
                                     <div className="md:col-span-2">
@@ -400,13 +428,13 @@ const CategoryPage = () => {
                                 <button
                                     type="button"
                                     onClick={() => setIsAdding(false)}
-                                    className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
+                                    className="cursor-pointer px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     type="submit"
-                                    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md shadow-sm text-sm font-medium"
+                                    className="cursor-pointer px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md shadow-sm text-sm font-medium"
                                 >
                                     Save Category
                                 </button>
@@ -478,16 +506,25 @@ const CategoryPage = () => {
                                             <div className="flex space-x-2">
                                                 <button
                                                     onClick={() => handleEdit(category)}
-                                                    className="text-blue-600 hover:text-blue-800 p-1 rounded hover:bg-blue-50"
+                                                    className="cursor-pointer text-blue-600 hover:text-blue-800 p-1 rounded hover:bg-blue-50"
                                                     title="Edit"
                                                 >
                                                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                                     </svg>
                                                 </button>
+                                                <ConfirmBox
+                                                    isOpen={isConfirmOpen}
+                                                    title="Confirm Deletion"
+                                                    message="Are you sure you want to delete this item?"
+                                                    onConfirm={handleConfirmAction}
+                                                    onCancel={handleConfirmAction}
+                                                    confirmText="Delete"
+                                                />
                                                 <button
-                                                    onClick={() => handleDelete(category._id || category.id)}
-                                                    className="text-red-600 hover:text-red-800 p-1 rounded hover:bg-red-50"
+                                                    onClick={() => setIsConfirmOpen(true)
+                                                    }
+                                                    className="cursor-pointer text-red-600 hover:text-red-800 p-1 rounded hover:bg-red-50"
                                                     title="Delete"
                                                 >
                                                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
