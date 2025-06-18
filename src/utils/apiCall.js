@@ -37,10 +37,27 @@ export const getCall = async (url = "") => {
 };
 // Post APi call
 export const postCall = async (url = "", data) => {
-  console.log(url);
-
   try {
     const response = await apiInstance.post(url, data);
+
+    return response;
+  } catch (error) {
+    return error;
+  }
+};
+// Update Api Call
+export const putCall = async (url = "", data) => {
+  try {
+    const response = await apiInstance.put(url, data);
+
+    return response;
+  } catch (error) {
+    return error;
+  }
+};
+export const deleteCall = async (url = "") => {
+  try {
+    const response = await apiInstance.delete(url);
 
     return response;
   } catch (error) {

@@ -1,5 +1,6 @@
 // import { satoshi } from "@/utils/fonts";
 import "./globals.css";
+import { Toaster } from "react-hot-toast";
 
 export const metadata = {
   title: "First Startup",
@@ -9,7 +10,10 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body className={`  antialiased`}>{children}</body>
+      <body className={`  antialiased`}>
+        <Toaster position="top-right" />
+        {children}
+      </body>
     </html>
   );
 }
