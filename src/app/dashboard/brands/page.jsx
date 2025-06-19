@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import ResponsivePagination from 'react-responsive-pagination';
 import { deleteCall, postCall, putCall } from '@/utils/apiCall';
 import { toast } from 'react-hot-toast';
-import ConfirmBox from '@/component/ConfirmBox';
+import ConfirmBox from '@/components/ConfirmBox';
 
 const BrandPage = () => {
     const [brands, setBrands] = useState([]);
