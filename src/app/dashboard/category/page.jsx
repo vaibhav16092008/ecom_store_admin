@@ -16,7 +16,10 @@ const CategoryPage = () => {
         search: "",
     });
     const [totalPages, setTotalPages] = useState(1);
-    const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+    const [isConfirmOpen, setIsConfirmOpen] = useState({
+        isOpen: false,
+        data: null
+    });
     const [newCategory, setNewCategory] = useState({
         name: '',
         slug: '',
@@ -135,15 +138,7 @@ const CategoryPage = () => {
     const generateSlug = (name) => {
         return name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
     };
-    const handleConfirmAction = (confirmed) => {
-        setIsConfirmOpen(false);
-        if (confirmed) {
-            console.log("User confirmed the action");
-            // Perform your action here
-        } else {
-            console.log("User canceled the action");
-        }
-    };
+
     const handleDelete = async (id) => {
         try {
 
@@ -156,7 +151,16 @@ const CategoryPage = () => {
             toast.error(err.response?.data?.message || 'Failed to delete category');
         }
     };
+    const handleConfirmAction = (confirmed) => {
 
+        if (confirmed) {
+            handleDelete(isConfirmOpen.data)
+        }
+        setIsConfirmOpen({
+            isOpen: false,
+            data: null
+        });
+    };
     const handleEdit = (category) => {
         setEditingCategory({
             id: category._id || category.id,
@@ -514,7 +518,7 @@ const CategoryPage = () => {
                                                     </svg>
                                                 </button>
                                                 <ConfirmBox
-                                                    isOpen={isConfirmOpen}
+                                                    isOpen={isConfirmOpen.isOpen}
                                                     title="Confirm Deletion"
                                                     message="Are you sure you want to delete this item?"
                                                     onConfirm={handleConfirmAction}
@@ -522,7 +526,10 @@ const CategoryPage = () => {
                                                     confirmText="Delete"
                                                 />
                                                 <button
-                                                    onClick={() => setIsConfirmOpen(true)
+                                                    onClick={() => setIsConfirmOpen({
+                                                        isOpen: true,
+                                                        data: category._id || category.id
+                                                    })
                                                     }
                                                     className="cursor-pointer text-red-600 hover:text-red-800 p-1 rounded hover:bg-red-50"
                                                     title="Delete"
