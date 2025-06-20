@@ -29,7 +29,6 @@ const BrandPage = () => {
         id: '',
         name: '',
         slug: '',
-        description: '',
         logo: '',
         isActive: true
     });
@@ -104,13 +103,10 @@ const BrandPage = () => {
 
     const handleUpdate = async (e) => {
         e.preventDefault();
-        const payload = {
-            ...editingBrand,
-            image: editingBrand.logo
-        }
+
 
         try {
-            const response = await putCall(`brand/edit`, payload);
+            const response = await putCall(`brand/edit`, editingBrand);
             console.log(response);
 
             setIsEditing(false);
@@ -160,8 +156,7 @@ const BrandPage = () => {
             id: brand._id || brand.id,
             name: brand.name,
             slug: brand.slug,
-            description: brand.description,
-            logo: brand.image,
+            logo: brand.logo,
             isActive: brand.isActive
         });
         setIsEditing(true);
@@ -256,17 +251,7 @@ const BrandPage = () => {
                                         />
                                     </div>
                                     <div className="md:col-span-2">
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
-                                        <textarea
-                                            name="description"
-                                            value={editingBrand.description}
-                                            onChange={handleEditInputChange}
-                                            rows={2}
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-sm"
-                                        />
-                                    </div>
-                                    <div className="md:col-span-2">
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">Image URL</label>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">Logo</label>
                                         <input
                                             type="url"
                                             name="logo"
@@ -440,7 +425,7 @@ const BrandPage = () => {
                                         <td className="px-5 py-4">
                                             <div className="flex items-center">
                                                 <div className="flex-shrink-0 h-10 w-10 rounded-md overflow-hidden">
-                                                    <img className="h-full w-full object-cover" src={brand.image} alt={brand.name} />
+                                                    <img className="h-full w-full object-cover" src={brand.logo} alt={brand.name} />
                                                 </div>
                                                 <div className="ml-3">
                                                     <div className="text-sm font-medium text-gray-900">{brand.name}</div>
@@ -454,7 +439,17 @@ const BrandPage = () => {
                                             </span>
                                         </td>
                                         <td className="px-5 py-4">
-                                            <div className="text-sm text-gray-500 max-w-xs line-clamp-2">{brand.description}</div>
+                                            <div className="relative">
+                                                <input
+                                                    type="checkbox"
+                                                    name="isActive"
+                                                    checked={brand.isActive}
+                                                    onChange={handleEditInputChange}
+                                                    className="sr-only"
+                                                />
+                                                <div className={`block w-12 h-6 rounded-full ${brand.isActive ? 'bg-blue-500' : 'bg-gray-300'}`}></div>
+                                                <div className={`dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition ${brand.isActive ? 'transform translate-x-6' : ''}`}></div>
+                                            </div>
                                         </td>
                                         <td className="px-5 py-4 whitespace-nowrap text-sm font-medium">
                                             <div className="flex space-x-2">
