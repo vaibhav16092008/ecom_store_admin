@@ -4,8 +4,10 @@ import Head from "next/head";
 import { setToken } from "@/utils/connection";
 import toast from "react-hot-toast";
 import { postCallWH } from "@/utils/apiCall";
+import { useRouter } from "next/navigation";
 
 const LoginPage = () => {
+  const router = useRouter();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [isFocused, setIsFocused] = useState({
@@ -26,7 +28,7 @@ const LoginPage = () => {
       if (response?.data?.status === 200) {
         toast.success(response?.data?.message || "Login successful!");
         setToken(response?.data?.data?.token);
-        window.location.href = "/dashboard";
+        router.push("/dashboard");
       }
     } catch (error) {
       toast.error(error.response?.data?.message || "Login failed");

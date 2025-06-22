@@ -104,9 +104,12 @@ const BrandPage = () => {
     const handleUpdate = async (e) => {
         e.preventDefault();
 
-
+        const payload = {
+            ...editingBrand,
+            status: editingBrand.isActive
+        }
         try {
-            const response = await putCall(`brand/edit`, editingBrand);
+            const response = await putCall(`brand/edit`, payload);
             console.log(response);
 
             setIsEditing(false);
@@ -114,7 +117,6 @@ const BrandPage = () => {
                 id: '',
                 name: '',
                 slug: '',
-                description: '',
                 logo: '',
                 isActive: true
             })
@@ -125,9 +127,6 @@ const BrandPage = () => {
         }
     };
 
-    const generateSlug = (name) => {
-        return name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-    };
 
     const handleDelete = async (id) => {
         try {
@@ -176,7 +175,25 @@ const BrandPage = () => {
             page
         }));
     };
+    const handleStatusChange = async (brand) => {
+        console.log(brand, "brand");
 
+        try {
+            const updatedBrand = {
+                ...brand,
+                id: brand._id,
+                status: !brand.isActive
+            };
+            console.log(updatedBrand, "updtae");
+
+            const response = await putCall(`brand/edit`, updatedBrand);
+            toast.success(response?.data?.message);
+            await fetchBrands();
+        } catch (err) {
+            console.error('Error updating brand status:', err);
+            toast.error(err.response?.data?.message || 'Failed to update brand status');
+        }
+    };
     if (loading && brands.length === 0) {
         return (
             <div className="container mx-auto px-4 py-8">
@@ -438,18 +455,22 @@ const BrandPage = () => {
                                                 {brand.isActive ? 'Active' : 'Inactive'}
                                             </span>
                                         </td>
-                                        <td className="px-5 py-4">
-                                            <div className="relative">
-                                                <input
-                                                    type="checkbox"
-                                                    name="isActive"
-                                                    checked={brand.isActive}
-                                                    onChange={handleEditInputChange}
-                                                    className="sr-only"
-                                                />
-                                                <div className={`block w-12 h-6 rounded-full ${brand.isActive ? 'bg-blue-500' : 'bg-gray-300'}`}></div>
-                                                <div className={`dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition ${brand.isActive ? 'transform translate-x-6' : ''}`}></div>
-                                            </div>
+                                        <td className="px-5 py-4 whitespace-nowrap">
+                                            <label className="flex items-center cursor-pointer">
+                                                <div className="relative">
+                                                    <input
+                                                        type="checkbox"
+                                                        className="sr-only"
+                                                        checked={brand.isActive}
+                                                        onChange={() => handleStatusChange(brand)}
+                                                    />
+                                                    <div className={`block w-12 h-6 rounded-full ${brand.isActive ? 'bg-blue-500' : 'bg-gray-300'}`}></div>
+                                                    <div className={`dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition ${brand.isActive ? 'transform translate-x-6' : ''}`}></div>
+                                                </div>
+                                                <div className="ml-2 text-sm text-gray-600">
+                                                    {brand.isActive ? 'Active' : 'Inactive'}
+                                                </div>
+                                            </label>
                                         </td>
                                         <td className="px-5 py-4 whitespace-nowrap text-sm font-medium">
                                             <div className="flex space-x-2">
