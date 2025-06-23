@@ -30,7 +30,7 @@ export const postCallWH = async (url = "", data) => {
 export const getCall = async (url = "") => {
   try {
     const response = await apiInstance.get(url);
-    return response?.data;
+    return response;
   } catch (error) {
     return error;
   }
