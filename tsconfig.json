@@ -28,6 +28,6 @@
     ".next/types/**/*.ts",
     "**/*.ts",
     "**/*.tsx"
-  ],
+, "src/components/Toaster.jsx", "src/app/ClientBody.jsx"  ],
   "exclude": ["node_modules"]
 }
