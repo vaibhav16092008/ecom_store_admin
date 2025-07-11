@@ -1,5 +1,7 @@
 // import { satoshi } from "@/utils/fonts";
+// import Toaster from "@/components/Toaster";
 import "./globals.css";
+import ClientBody from "./ClientBody";
 import { Toaster } from "react-hot-toast";
 
 export const metadata = {
@@ -10,9 +12,11 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body className={`  antialiased`}>
-        <Toaster position="top-right" />
-        {children}
+      <body className={`antialiased`}>
+        <ClientBody>
+          {children}
+          <Toaster position="top-right" />
+        </ClientBody>
       </body>
     </html>
   );
