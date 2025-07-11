@@ -41,12 +41,13 @@ const CategoryPage = () => {
     const [isEditing, setIsEditing] = useState(false);
 
     useEffect(() => {
+        setLoading(true);
         fetchCategories();
     }, [query.page, query.search]);
 
     const fetchCategories = async () => {
         try {
-            setLoading(true);
+
             const response = await postCall('category', {
                 all: query.all,
                 page: query.page,

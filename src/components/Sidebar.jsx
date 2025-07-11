@@ -1,13 +1,14 @@
 'use client';
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { FiHome, FiCompass, FiBookmark, FiSettings, FiUser, FiLogOut, FiChevronDown, FiChevronRight, FiPackage, FiPaperclip, FiPocket, FiX } from "react-icons/fi";
 import { useState } from "react";
 import { removeToken } from "@/utils/connection";
 import { useSidebar } from "@/context/SidebarContext";
 
 const Sidebar = () => {
+    const router = useRouter();
     const pathname = usePathname();
     const [expandedMenus, setExpandedMenus] = useState({});
     const { isSidebarOpen, closeSidebar, isMobile } = useSidebar();
@@ -22,7 +23,7 @@ const Sidebar = () => {
 
     const handleLogout = () => {
         removeToken();
-        window.location.href = "/login";
+        router.push("/login")
     };
 
     const navItems = [
